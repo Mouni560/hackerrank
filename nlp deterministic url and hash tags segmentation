@@ -1,0 +1,67 @@
+import re
+
+def load_words(file_path="words.txt"):
+    """Load the dictionary of words from a file."""
+    with open(file_path, "r") as file:
+        return set(word.strip().lower() for word in file.readlines())
+
+def preprocess_input(input_line):
+    """
+    Preprocess the input:
+    - Remove "www." and domain extensions for domain names.
+    - Remove "#" for hashtags.
+    """
+    input_line = input_line.lower()
+    if input_line.startswith("www."):
+        # Remove "www." and domain extensions
+        input_line = re.sub(r'^www\.|(\.[a-z]{2,3}(\.[a-z]{2})?)$', '', input_line)
+    elif input_line.startswith("#"):
+        # Remove the hashtag symbol
+        input_line = input_line[1:]
+    elif re.match(r"^[a-z]+\.[a-z]{2,3}(\.[a-z]{2})?$", input_line):
+        # For standalone domain names, remove extensions
+        input_line = re.sub(r'\.[a-z]{2,3}(\.[a-z]{2})?$', '', input_line)
+    return input_line
+
+def segment_string(s, word_set):
+    """
+    Segment a string into valid words or numbers using a greedy algorithm.
+    - Tries to match the longest possible prefix in the dictionary or as a number.
+    """
+    if not s:
+        return []
+
+    for i in range(len(s), 0, -1):
+        prefix = s[:i]
+        
+        if prefix in word_set or re.fullmatch(r'\d+(\.\d+)?', prefix):
+            rest = segment_string(s[i:], word_set)
+            if rest is not None:  # Successful segmentation
+                return [prefix] + rest
+    return None  # No valid segmentation
+
+def main():
+    
+    word_set = load_words("words.txt")
+    
+    
+    n = int(input())
+    inputs = [input().strip() for _ in range(n)]
+    
+    
+    results = []
+    for line in inputs:
+        processed_input = preprocess_input(line)
+        segmented = segment_string(processed_input, word_set)
+        if segmented:
+            results.append(" ".join(segmented))
+        else:
+            
+            results.append(processed_input)
+    
+    
+    for result in results:
+        print(result)
+
+if __name__ == "__main__":
+    main()
