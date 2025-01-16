@@ -1,0 +1,49 @@
+def detect_language(text):
+    # Lowercase the text for uniformity
+    text = text.lower()
+
+    # Tokenize the text into words (split by spaces)
+    words = set(text.split())
+
+    # Define common words for each language (using sets for faster lookup)
+    german_keywords = {'der', 'die', 'und', 'es', 'in', 'zu', 'ist', 'hunger', 'mann', 'hatte', 'ein', 'eine', 'sich'}
+    english_keywords = {'the', 'and', 'is', 'it', 'of', 'to', 'a', 'was', 'in', 'that', 'for', 'on', 'with', 'at'}
+    french_keywords = {'le', 'la', 'de', 'est', 'et', 'les', 'un', 'une', 'des', 'sur', 'par', 'que'}
+    spanish_keywords = {'el', 'la', 'de', 'y', 'que', 'en', 'los', 'las', 'un', 'una', 'te', 'si', 'para', 'con'}
+
+    # Count how many words from each language appear in the text
+    german_count = len(words & german_keywords)  # Set intersection
+    english_count = len(words & english_keywords)
+    french_count = len(words & french_keywords)
+    spanish_count = len(words & spanish_keywords)
+
+    # Create a dictionary to store the language scores
+    language_scores = {
+        'German': german_count,
+        'English': english_count,
+        'French': french_count,
+        'Spanish': spanish_count
+    }
+
+    # Identify the language with the highest score
+    detected_language = max(language_scores, key=language_scores.get)
+
+    return detected_language
+
+
+def main():
+    # Read all input text (multiple lines until EOF)
+    text = ""
+    while True:
+        try:
+            line = input()
+            text += line + " "
+        except EOFError:
+            break
+
+    # Detect language and print
+    print(detect_language(text.strip()))
+
+
+if __name__ == "__main__":
+    main()
