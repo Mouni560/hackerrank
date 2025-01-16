@@ -1,0 +1,44 @@
+Compiler Message
+Success
+Input (stdin)
+30
+weather.com
+businessweek.com
+#businessweek89
+#businessweek29.5
+noaa.gov
+whitehouse.gov
+#56media
+bluehost.com
+privacy.gov.au
+mediafire.com
+opensource.org
+people.com.cn
+last.fm
+bandcamp.com
+dropbox.com
+independent.co.uk
+who.int
+discovery.com
+house.gov{-truncated-}
+Expected Output
+weather
+business week
+business week 89
+business week 29.5
+no a a
+white house
+56 media
+blue host
+privacy
+media fire
+open source
+people
+last
+band camp
+drop box
+independent
+who
+discovery
+house
+blink web{-truncated-}
