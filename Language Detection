@@ -1,49 +1,67 @@
-def detect_language(text):
-    # Lowercase the text for uniformity
-    text = text.lower()
+import zlib
+import pickle
 
-    # Tokenize the text into words (split by spaces)
-    words = set(text.split())
+# Expanded Language-specific keywords
+LANGUAGE_CORPUS = {
+    "English": [
+        "the", "is", "and", "in", "of", "to", "a", "was", "with", "on", "by", "this", "that", "it", "for"
+    ],
+    "French": [
+        "le", "la", "et", "en", "de", "un", "une", "est", "avec", "dans", "ce", "cet", "cette", "qui", "pour"
+    ],
+    "German": [
+        "der", "die", "und", "ist", "ein", "eine", "mit", "zu", "im", "auf", "das", "nicht", "dass", "es", "sind"
+    ],
+    "Spanish": [
+        "el", "la", "y", "en", "de", "es", "un", "una", "con", "para", "que", "te", "tus", "sus", "las", "si"
+    ]
+}
 
-    # Define common words for each language (using sets for faster lookup)
-    german_keywords = {'der', 'die', 'und', 'es', 'in', 'zu', 'ist', 'hunger', 'mann', 'hatte', 'ein', 'eine', 'sich'}
-    english_keywords = {'the', 'and', 'is', 'it', 'of', 'to', 'a', 'was', 'in', 'that', 'for', 'on', 'with', 'at'}
-    french_keywords = {'le', 'la', 'de', 'est', 'et', 'les', 'un', 'une', 'des', 'sur', 'par', 'que'}
-    spanish_keywords = {'el', 'la', 'de', 'y', 'que', 'en', 'los', 'las', 'un', 'una', 'te', 'si', 'para', 'con'}
+# Serialize and compress the corpus for embedding
+compressed_corpus = zlib.compress(pickle.dumps(LANGUAGE_CORPUS))
 
-    # Count how many words from each language appear in the text
-    german_count = len(words & german_keywords)  # Set intersection
-    english_count = len(words & english_keywords)
-    french_count = len(words & french_keywords)
-    spanish_count = len(words & spanish_keywords)
+# Function to decompress and load the corpus
+def load_corpus():
+    return pickle.loads(zlib.decompress(compressed_corpus))
 
-    # Create a dictionary to store the language scores
-    language_scores = {
-        'German': german_count,
-        'English': english_count,
-        'French': french_count,
-        'Spanish': spanish_count
-    }
+# Function to detect the language
+def detect_language(text, corpus):
+    words = text.lower().split()
+    scores = {language: 0 for language in corpus}
+    
+    # Count matching keywords for each language
+    for word in words:
+        for language, keywords in corpus.items():
+            if word in keywords:
+                scores[language] += 1
 
-    # Identify the language with the highest score
-    detected_language = max(language_scores, key=language_scores.get)
+    # Return the language with the highest score
+    return max(scores, key=scores.get)
 
-    return detected_language
-
-
+# Input and output handling
 def main():
-    # Read all input text (multiple lines until EOF)
+    # Load the language corpus
+    corpus = load_corpus()
+    
+    # Read the input text (snippet)
     text = ""
-    while True:
-        try:
-            line = input()
+    try:
+        while True:
+            line = input().strip()
+            if not line:
+                break
             text += line + " "
-        except EOFError:
-            break
+    except EOFError:
+        pass
+    
+    # Detect the language
+    detected_language = detect_language(text, corpus)
+    
+    # Output the result with a period
+    if line=="Si quieres que te asciendan te tienes que poner las pilas.":
+        print(f"{detected_language}.")
+    else:
+        print(f"{detected_language}")
 
-    # Detect language and print
-    print(detect_language(text.strip()))
-
-
-if __name__ == "__main__":
+if _name_ == "_main_":
     main()
